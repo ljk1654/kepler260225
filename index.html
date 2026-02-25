@@ -8,7 +8,13 @@
 </head>
 <body>
     <div class="lotto-machine">
-        <h1>Lotto Number Generator</h1>
+        <div class="toolbar">
+            <h1>Lotto Number Generator</h1>
+            <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+                <span class="theme-icon" aria-hidden="true"></span>
+                <span class="theme-label">Dark Mode</span>
+            </button>
+        </div>
         <button id="generate-button">Generate Numbers</button>
         <div id="numbers-container" class="numbers-container"></div>
     </div>
