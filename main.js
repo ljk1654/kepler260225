@@ -14,6 +14,9 @@ const summaryEl = document.getElementById('summary');
 const prevButton = document.getElementById('prev-page');
 const nextButton = document.getElementById('next-page');
 const pageIndicator = document.getElementById('page-indicator');
+const listView = document.getElementById('list-view');
+const detailView = document.getElementById('detail-view');
+const backButton = document.getElementById('back-button');
 
 const state = {
     page: 1,
@@ -40,6 +43,19 @@ nextButton.addEventListener('click', () => {
     loadJobs();
 });
 
+backButton.addEventListener('click', () => {
+    history.back();
+});
+
+window.addEventListener('popstate', (event) => {
+    if (event.state?.view === 'detail') {
+        showDetail(event.state.item, event.state.normalized, false);
+        return;
+    }
+    showList();
+    loadJobs();
+});
+
 if (apiUrlInput.value) {
     loadJobs();
 }
@@ -53,6 +69,7 @@ async function loadJobs() {
 
     localStorage.setItem(STORAGE_KEY, apiUrl);
 
+    showList();
     setStatus('데이터를 불러오는 중입니다...');
     listEl.innerHTML = '';
     summaryEl.textContent = '일자리 정보를 불러오는 중입니다.';
@@ -142,17 +159,18 @@ function renderList(items) {
         `;
         row.addEventListener('click', () => {
             selectRow(row);
-            renderDetail(item, normalized);
+            showDetail(item, normalized, true);
         });
         listEl.appendChild(row);
-        if (index === 0) {
-            selectRow(row);
-            renderDetail(item, normalized);
-        }
     });
 }
 
-function renderDetail(item, normalized) {
+function showDetail(item, normalized, pushHistory) {
+    listView.hidden = true;
+    detailView.hidden = false;
+    if (pushHistory) {
+        history.pushState({ view: 'detail', item, normalized }, '', '#detail');
+    }
     const details = buildDetailList(item, normalized);
     detailEl.innerHTML = `
         <h3>${escapeHtml(normalized.title)}</h3>
@@ -167,6 +185,11 @@ function renderDetail(item, normalized) {
         </div>
         ${normalized.link ? `<a href="${escapeHtml(normalized.link)}" target="_blank" rel="noopener">공고 자세히 보기</a>` : ''}
     `;
+}
+
+function showList() {
+    listView.hidden = false;
+    detailView.hidden = true;
 }
 
 function updateSummary() {
