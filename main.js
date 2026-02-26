@@ -131,18 +131,22 @@ function renderList(items) {
     listEl.innerHTML = '';
     items.forEach((item, index) => {
         const normalized = normalizeItem(item);
-        const card = document.createElement('article');
-        card.className = 'card';
-        card.innerHTML = `
+        const row = document.createElement('div');
+        row.className = 'list-item';
+        row.dataset.index = String(index);
+        row.innerHTML = `
             <h4>${escapeHtml(normalized.title)}</h4>
-            <p>${escapeHtml(normalized.summary)}</p>
-            <div class="tag-list">
-                ${normalized.tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
-            </div>
+            <span>${escapeHtml(normalized.agency)}</span>
+            <span>${escapeHtml(normalized.location)}</span>
+            <time>${escapeHtml(normalized.deadline)}</time>
         `;
-        card.addEventListener('click', () => renderDetail(item, normalized));
-        listEl.appendChild(card);
+        row.addEventListener('click', () => {
+            selectRow(row);
+            renderDetail(item, normalized);
+        });
+        listEl.appendChild(row);
         if (index === 0) {
+            selectRow(row);
             renderDetail(item, normalized);
         }
     });
@@ -273,6 +277,10 @@ function normalizeItem(item) {
         title,
         summary,
         tags: [agency, location, category, deadline].filter(Boolean),
+        agency,
+        location,
+        category,
+        deadline,
         link,
     };
 }
@@ -305,6 +313,14 @@ function pickFirst(item, keys) {
 
 function setStatus(message) {
     statusEl.textContent = message;
+}
+
+function selectRow(row) {
+    const current = listEl.querySelector('.list-item.selected');
+    if (current) {
+        current.classList.remove('selected');
+    }
+    row.classList.add('selected');
 }
 
 function escapeHtml(value) {

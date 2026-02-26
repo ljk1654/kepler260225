@@ -7,38 +7,41 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="page">
-        <header class="hero">
-            <div>
-                <p class="eyebrow">Arts Management Support Center · OpenAPI</p>
+        <header class="top">
+            <div class="title-block">
+                <p class="eyebrow">문화체육관광부 · 예술경영지원센터 OpenAPI</p>
                 <h1>문화예술 일자리 정보</h1>
-                <p class="subtitle">문화예술 분야 채용 공고를 한눈에 확인하고, 상세 정보를 빠르게 살펴보세요.</p>
+                <p class="subtitle">공고명, 기관, 지역, 마감일 중심으로 빠르게 탐색하고 상세 정보를 확인하세요.</p>
             </div>
-            <div class="hero-card">
-                <div class="hero-stat">
-                    <span class="stat-label">서비스키</span>
-                    <span class="stat-value">등록 완료</span>
+            <div class="meta">
+                <div class="meta-item">
+                    <span>서비스키</span>
+                    <strong>등록 완료</strong>
                 </div>
-                <div class="hero-stat">
-                    <span class="stat-label">응답 형식</span>
-                    <span class="stat-value">JSON / XML</span>
+                <div class="meta-item">
+                    <span>응답 형식</span>
+                    <strong>JSON / XML</strong>
                 </div>
-                <p class="hero-hint">요청 URL만 입력하면 바로 조회됩니다.</p>
+                <div class="meta-item">
+                    <span>기본 URL</span>
+                    <strong>API_CIA_077</strong>
+                </div>
             </div>
         </header>
 
-        <section class="panel">
+        <section class="panel filters-panel">
             <div class="panel-header">
                 <h2>조회 설정</h2>
-                <p>문화포털 OpenAPI 요청 URL을 입력한 뒤 검색해 주세요.</p>
+                <p>요청 URL을 입력한 뒤 검색하면 최신 일자리 공고를 불러옵니다.</p>
             </div>
             <div class="filters">
                 <label class="field">
                     <span>요청 URL</span>
-                    <input id="api-url" type="text" placeholder="https://api.kcisa.kr/openapi/service/rest/..." autocomplete="off">
+                    <input id="api-url" type="text" placeholder="https://api.kcisa.kr/API_CIA_077/request" autocomplete="off">
                 </label>
                 <label class="field">
                     <span>검색어</span>
@@ -55,7 +58,7 @@
                 </label>
                 <label class="field">
                     <span>추가 파라미터</span>
-                    <input id="extra-params" type="text" placeholder="key=value&key2=value2">
+                    <input id="extra-params" type="text" placeholder="예: category=공연&region=서울">
                 </label>
             </div>
             <div class="actions">
@@ -76,13 +79,17 @@
                     <button id="next-page" type="button" aria-label="다음 페이지">다음</button>
                 </div>
             </div>
-            <div class="results-body">
-                <div id="list" class="cards"></div>
-                <aside class="detail" id="detail">
-                    <h3>상세 정보</h3>
-                    <p>목록에서 공고를 선택하면 상세 정보를 표시합니다.</p>
-                </aside>
+            <div class="list-header">
+                <span>공고명</span>
+                <span>기관</span>
+                <span>지역</span>
+                <span>마감</span>
             </div>
+            <div id="list" class="list"></div>
+            <aside class="detail" id="detail">
+                <h3>상세 정보</h3>
+                <p>목록에서 공고를 선택하면 상세 정보를 표시합니다.</p>
+            </aside>
         </section>
     </div>
 
