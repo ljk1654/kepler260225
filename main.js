@@ -9,14 +9,11 @@ const extraParamsInput = document.getElementById('extra-params');
 const searchButton = document.getElementById('search-button');
 const statusEl = document.getElementById('status');
 const listEl = document.getElementById('list');
-const detailEl = document.getElementById('detail');
 const summaryEl = document.getElementById('summary');
 const prevButton = document.getElementById('prev-page');
 const nextButton = document.getElementById('next-page');
 const pageIndicator = document.getElementById('page-indicator');
-const listView = document.getElementById('list-view');
-const detailView = document.getElementById('detail-view');
-const backButton = document.getElementById('back-button');
+const STORAGE_DETAIL_KEY = 'selectedJobDetail';
 
 const state = {
     page: 1,
@@ -43,18 +40,7 @@ nextButton.addEventListener('click', () => {
     loadJobs();
 });
 
-backButton.addEventListener('click', () => {
-    history.back();
-});
-
-window.addEventListener('popstate', (event) => {
-    if (event.state?.view === 'detail') {
-        showDetail(event.state.item, event.state.normalized, false);
-        return;
-    }
-    showList();
-    loadJobs();
-});
+// 목록 페이지에서는 상세 페이지 이동만 처리한다.
 
 if (apiUrlInput.value) {
     loadJobs();
@@ -69,7 +55,6 @@ async function loadJobs() {
 
     localStorage.setItem(STORAGE_KEY, apiUrl);
 
-    showList();
     setStatus('데이터를 불러오는 중입니다...');
     listEl.innerHTML = '';
     summaryEl.textContent = '일자리 정보를 불러오는 중입니다.';
@@ -100,7 +85,7 @@ async function loadJobs() {
         listEl.innerHTML = '<div class="empty">데이터를 불러오지 못했습니다. 요청 URL 또는 CORS 설정을 확인해 주세요.</div>';
         summaryEl.textContent = '오류로 인해 데이터를 가져오지 못했습니다.';
         setStatus(error.message || '알 수 없는 오류');
-        detailEl.innerHTML = '<h3>상세 정보</h3><p>요청 정보를 확인하고 다시 시도해 주세요.</p>';
+        // 상세 페이지에서 다시 확인하도록 안내
     }
 
     pageIndicator.textContent = String(state.page);
@@ -159,37 +144,11 @@ function renderList(items) {
         `;
         row.addEventListener('click', () => {
             selectRow(row);
-            showDetail(item, normalized, true);
+            sessionStorage.setItem(STORAGE_DETAIL_KEY, JSON.stringify({ item, normalized }));
+            window.location.href = 'detail.html';
         });
         listEl.appendChild(row);
     });
-}
-
-function showDetail(item, normalized, pushHistory) {
-    listView.hidden = true;
-    detailView.hidden = false;
-    if (pushHistory) {
-        history.pushState({ view: 'detail', item, normalized }, '', '#detail');
-    }
-    const details = buildDetailList(item, normalized);
-    detailEl.innerHTML = `
-        <h3>${escapeHtml(normalized.title)}</h3>
-        <p>${escapeHtml(normalized.summary)}</p>
-        <div class="detail-list">
-            ${details.map((detail) => `
-                <div class="detail-item">
-                    <span>${escapeHtml(detail.label)}</span>
-                    <strong>${escapeHtml(detail.value)}</strong>
-                </div>
-            `).join('')}
-        </div>
-        ${normalized.link ? `<a href="${escapeHtml(normalized.link)}" target="_blank" rel="noopener">공고 자세히 보기</a>` : ''}
-    `;
-}
-
-function showList() {
-    listView.hidden = false;
-    detailView.hidden = true;
 }
 
 function updateSummary() {
@@ -306,22 +265,6 @@ function normalizeItem(item) {
         deadline,
         link,
     };
-}
-
-function buildDetailList(item, normalized) {
-    const preferred = [
-        { label: '기관', value: normalized.tags[0] },
-        { label: '지역', value: normalized.tags[1] },
-        { label: '분류', value: normalized.tags[2] },
-        { label: '마감', value: normalized.tags[3] },
-    ];
-
-    const dynamic = Object.entries(item)
-        .filter(([key, value]) => typeof value !== 'object' && value !== null && value !== '')
-        .slice(0, 8)
-        .map(([key, value]) => ({ label: key, value: String(value) }));
-
-    return [...preferred, ...dynamic].filter((entry) => entry.value);
 }
 
 function pickFirst(item, keys) {
